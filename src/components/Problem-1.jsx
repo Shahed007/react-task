@@ -13,7 +13,7 @@ const Problem1 = () => {
     const newTask = { name, status };
 
     try {
-      const res = await fetch("http://localhost:5000/task", {
+      const res = await fetch("https://react-task-server-hazel.vercel.app/task", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +34,7 @@ const Problem1 = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/tasks");
+        const res = await fetch("https://react-task-server-hazel.vercel.app/tasks");
         const data = await res.json();
         setOriginalTask(data);
         setFilteredTask(data);
