@@ -1,21 +1,61 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Problem1 = () => {
   const [show, setShow] = useState("all");
-  const [task, setTask] = useState([]);
+  const [originalTask, setOriginalTask] = useState([]);
+  const [filteredTask, setFilteredTask] = useState([]);
+
+  const handleAddTask = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const name = form.name.value;
+    const status = form.status.value.toLowerCase();
+    const newTask = { name, status };
+
+    try {
+      const res = await fetch("http://localhost:5000/task", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newTask),
+      });
+
+      const data = await res.json();
+      console.log(data);
+
+      setOriginalTask([...originalTask, newTask]);
+      setFilteredTask([...originalTask, newTask]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/tasks");
+        const data = await res.json();
+        setOriginalTask(data);
+        setFilteredTask(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleClick = (val) => {
     setShow(val);
-  };
-
-  const handleAddTask = (e) => {
-    e.preventDefault();
-
-    const form = e.target;
-    const name = form.name.value;
-    const status = form.status.value;
-    const newTask = { name, status };
-    setTask([...task, newTask]);
+    if (val === "active") {
+      const filterTask = originalTask?.filter((item) => item.status === val);
+      setFilteredTask(filterTask);
+    } else if (val === "completed") {
+      const filterTask = originalTask?.filter((item) => item.status === val);
+      setFilteredTask(filterTask);
+    } else {
+      setFilteredTask(originalTask);
+    }
   };
 
   return (
@@ -87,7 +127,7 @@ const Problem1 = () => {
                 <th scope="col">Name</th>
                 <th scope="col">Status</th>
               </tr>
-              {task.map((item, idx) => (
+              {filteredTask?.map((item, idx) => (
                 <tr key={idx}>
                   <td>{item.name}</td>
                   <td>{item.status}</td>
